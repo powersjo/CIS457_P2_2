@@ -53,6 +53,15 @@ class Project2Resolver {
     }
     System.out.printf("DNS resolver started on port %d\n", socketNum);
 
+    /********************************
+    * Create the cache class, to be started and used only while 
+    * the server is running
+    *********************************/
+
+    DNSCache serverCache = new DNSCache();
+
+    //*********************************************************
+
     // Set server to listen for a DatagramPacket from client
     byte[] receiveData = new byte[1024];
     DatagramPacket packet = new DatagramPacket(receiveData, receiveData.length);
@@ -92,6 +101,14 @@ class Project2Resolver {
     InetAddress address;
     DatagramPacket response;
     PacketInfo responseInfo = null;
+
+    //-------------------------------------------------------------------------
+    if(inCache(information)){
+      doneSearching = true;
+    } else {
+      System.out.println("Query is not in cache.\n");
+    }
+    //-------------------------------------------------------------------------
 
     //Loop until an answer is found or there is an error
     while(!doneSearching && !error) {
@@ -140,8 +157,6 @@ class Project2Resolver {
 	responseInfo.setErrorCode();
       }
     }
-
-
     
     //Send answer back to client
     answers = responseInfo.getAnswerRecords();
@@ -157,6 +172,15 @@ class Project2Resolver {
       responseInfo.getByteArray().length, address, port);
     serverSocket.send(toClient);
   }
+
+  /*********************************************************
+  * Method is to check if query is in cache
+  **********************************************************/
+   public static boolean inCache(PacketInfo myQuery){
+    //TODO
+    
+    return false;
+   }
 
   /*********************************************************
   * Method to check if user generated input is an integer
