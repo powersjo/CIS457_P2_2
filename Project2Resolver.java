@@ -9,7 +9,7 @@ import java.util.ArrayList;
 * Recursive DNS caching resolver
 *
 *
-* @author Joel Truman
+* @author Jonathan Powers, Brett Greenman, Kevin Anderson
 * @version Fall 2015
 ********************************************************************************/
 
@@ -20,6 +20,7 @@ class Project2Resolver {
 
   static ArrayList<String> results;
   static ArrayList<String> answers;
+  public static PacketInfo information;
 
   /**************************************************************************
   * Main method that prompts user input and opens a DatagramSocket
@@ -60,7 +61,7 @@ class Project2Resolver {
 
     DNSCache serverCache = new DNSCache();
 
-    //*********************************************************
+    /*********************************************************/
 
     // Set server to listen for a DatagramPacket from client
     byte[] receiveData = new byte[1024];
@@ -68,7 +69,7 @@ class Project2Resolver {
     serverSocket.receive(packet);
 
     // Print packet info from client using helper class PacketInfo()
-    PacketInfo information = new PacketInfo(packet);
+    information = new PacketInfo(packet);
     information.getValues();
     information.getQuestions();
     information.getAnswers();
@@ -105,8 +106,17 @@ class Project2Resolver {
     //-------------------------------------------------------------------------
     if(inCache(information)){
       doneSearching = true;
+      System.out.println("Query is in cache\n");
     } else {
       System.out.println("Query is not in cache.\n");
+      /*********************************************************************
+      * Either need to send the parsed string 'edu' 'com' etc. from the full
+      * domain request or figure out where the top level is code/string is 
+      * stored in the header and send that.
+      **********************************************************************/
+      if(serverCache.checkTopLevel(information)){
+	
+      }
     }
     //-------------------------------------------------------------------------
 
@@ -178,7 +188,15 @@ class Project2Resolver {
   **********************************************************/
    public static boolean inCache(PacketInfo myQuery){
     //TODO
-    
+    if(DNSCache.checkCompleteDomain(myQuery.getNameRequested())){
+
+      /************************************
+      * TODO
+      * Set the query to the cache response
+      *************************************/
+      answers = DNSCache.appendComplete(myQuery.getNameRequested(), DNSCache.getIP(myQuery.getNameRequested()))
+      return true;
+    }
     return false;
    }
 

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 * 
 * This class is a helper class that extracts info from Datagram Packets
 *
-* @author Joel Truman
+* @author Jonathan Powers, Brett Greenman, Kevin Anderson
 * @version Fall 2015
 **********************************************************************************/
 
