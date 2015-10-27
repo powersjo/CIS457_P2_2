@@ -106,19 +106,20 @@ class Project2Resolver {
             //-------------------------------------------------------------------------
             if(serverCache.checkCompleteDomain(information.getNameRequested())){
                 // if cache has complete domain, skip recursive search for IP
+                wasCached = true;
                 System.out.println("Query is in cache\n");
                 doneSearching = true;
-                byte [] respond = new byte[1024];
+                byte [] respond = new byte[512];
                 ByteBuffer buffer =ByteBuffer.wrap(respond);
                 buffer.putShort((short)information.getID());
-                buffer.putShort((short)0x8180); //hex representation of flags
+                buffer.putShort((short)0x8080); //hex representation of flags
                 buffer.putShort((short) 1); //QDCount
                 buffer.putShort((short) serverCache.getValue(information.getNameRequested()).size()); //ANCount
                 buffer.putShort((short) 0); //NSCount
                 buffer.putShort((short) 0); //ARCount
                 //Questions section
                 for(int i = 0; i < information.getNameRequested().length(); i++){
-                    buffer.putShort((short) information.getNameRequested().charAt(i));
+                    buffer.put((byte) information.getNameRequested().charAt(i));
                 }
                 buffer.putShort((short) information.getQType());
                 buffer.putShort((short) information.getQClass());
@@ -206,37 +207,37 @@ class Project2Resolver {
 
             //Send answer back to client
             if(!wasCached){
-            answers = responseInfo.getAnswerRecords();
-            System.out.println("Answers found:");
-            ArrayList<String> ipList = new ArrayList<String>(); //used to add answer to cache
-            for(int i = 0; i < answers.size(); i++) {
-                System.out.println(answers.get(i));
-                ipList.add(answers.get(i));
-            }
-            serverCache.appendComplete(responseInfo.getNameRequested(), ipList); //TODO ADD TTL
-            System.out.println("\nSending answer to client\n");
+                answers = responseInfo.getAnswerRecords();
+                System.out.println("Answers found:");
+                ArrayList<String> ipList = new ArrayList<String>(); //used to add answer to cache
+                for(int i = 0; i < answers.size(); i++) {
+                    System.out.println(answers.get(i));
+                    ipList.add(answers.get(i));
+                }
+                serverCache.appendComplete(responseInfo.getNameRequested(), ipList); //TODO ADD TTL
+                System.out.println("\nSending answer to client\n");
 
-            address = InetAddress.getByName("127.0.0.1");
-            int port = packet.getPort();
-            DatagramPacket toClient = new DatagramPacket(responseInfo.getByteArray(),
-                    responseInfo.getByteArray().length, address, port);
-            serverSocket.send(toClient);
+                address = InetAddress.getByName("127.0.0.1");
+                int port = packet.getPort();
+                DatagramPacket toClient = new DatagramPacket(responseInfo.getByteArray(),
+                        responseInfo.getByteArray().length, address, port);
+                serverSocket.send(toClient);
             }
         }
     }
 
     /*********************************************************
-  * Method to check if user generated input is an integer
-  **********************************************************/
-  public static boolean isInteger(String str) {  
-    
-    try {  
-      int i = Integer.parseInt(str);  
-    }  
-    catch(NumberFormatException e) {  
-      return false;  
-    }  
-    return true;  
-  }
+     * Method to check if user generated input is an integer
+     **********************************************************/
+    public static boolean isInteger(String str) {
+
+        try {
+            int i = Integer.parseInt(str);
+        }
+        catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
 
 }
