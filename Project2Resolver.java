@@ -105,6 +105,7 @@ class Project2Resolver {
             //-------------------------------------------------------------------------
             if(serverCache.checkCompleteDomain(information.getNameRequested())){
                 // if cache has complete domain, skip recursive search for IP
+                int f = 0;
                 wasCached = true;
                 System.out.println("Query is in cache\n");
                 doneSearching = true;
@@ -116,32 +117,38 @@ class Project2Resolver {
                 buffer.putShort((short) serverCache.getValue(information.getNameRequested()).size()); //ANCount
                 buffer.putShort((short) 0); //NSCount
                 buffer.putShort((short) 0); //ARCount
+                f += 12;
                 //Questions section
                 for(int i = 0; i < information.getNameRequested().length(); i++){
                     buffer.put((byte) information.getNameRequested().charAt(i));
+                    f++;
                 }
                 buffer.putShort((short) information.getQType());
                 buffer.putShort((short) information.getQClass());
+                f += 4;
                 //Answers section
                 for(String s : serverCache.getValue(information.getNameRequested())){
                     for(int i = 0; i < information.getNameRequested().length(); i++){
-                        buffer.putShort((short) information.getNameRequested().charAt(i));
+                        buffer.put((byte) information.getNameRequested().charAt(i));
+                        f ++;
                     }
                     buffer.putShort((short) 1); //Type field
                     buffer.putShort((short) 1); //Class Field
                     buffer.putInt(2000); //TTL field. TODO CHANGE THIS VALUE TO LIFESPAN
                     buffer.putShort((short) 4); //RDLength, assuming IPv4 address
+                    f += 10;
                     for(int i = 0; i < s.length(); i++){
-                        if(s.charAt(i) != '.')
-                            buffer.putShort((short) s.charAt(i));
+                        if(s.charAt(i) != '.'){
+                            buffer.put((byte) s.charAt(i));
+                            f ++;
+                         }
                     }
                 }
                 System.out.println("\nSending answer to client\n");
-
                 address = InetAddress.getByName("127.0.0.1");
                 int port = packet.getPort();
                 DatagramPacket toClient = new DatagramPacket(respond,
-                        respond.length, address, port);
+                        f, address, port);
                 serverSocket.send(toClient);
 
             } /*else if (serverCache.checkTopLevel(){
