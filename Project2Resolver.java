@@ -28,7 +28,10 @@ class Project2Resolver {
     public static void main(String[] args) throws IOException {
         //Read command line argument
         String userInput;
-        int socketNum;
+        int socketNum, socketTime;
+        socketTime = 15000;
+        Boolean timedOut = false;
+        String nextServer = "198.41.0.4"; //Initial server to check is 198.41.0.4
         DatagramSocket serverSocket = null;
         if(args.length > 0)
             userInput = args[0];
@@ -46,11 +49,25 @@ class Project2Resolver {
         // Create a socket that listens on port designated by user.
         try {
             serverSocket = new DatagramSocket(socketNum);
-        }
-        catch (IOException e) {
+            serverSocket.setSoTimeout(socketTime);
+        } catch (IOException e) {
             System.out.printf("The port you specified cannot be used. Please launch the application again.\n");
             System.exit(1);
-        }
+        } catch (SocketTimeoutException e) {
+			System.out.println("Conneection timed out");
+			timedOut = true;
+			int countMe = 1;
+			while (timedOut){
+			    try{
+			        serverSocket = new DatagramSocket(socketNum + countMe);
+			        serverSocket.setSoTimeout(socketTime);
+			    } catch (SocketTimeoutException e){
+			        countMe++;
+			        System.out.println("Conneection timed out");
+			    }
+			    timedOut = false;
+			}
+		}
         System.out.printf("DNS resolver started on port %d\n", socketNum);
 
         /********************************
@@ -96,7 +113,7 @@ class Project2Resolver {
 
             //Send DatagramPacket down server tree with recursion desired bit unset
             information.unsetRecursion();
-            String nextServer = "198.41.0.4"; //Initial server to check is 198.41.0.4
+           
             boolean doneSearching = false;
             boolean error = false;
             InetAddress address;
