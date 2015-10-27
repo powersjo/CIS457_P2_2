@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.HashMap<K,V>
+import java.util.HashMap;
 
 /********************************************************************************
 * CIS 457
@@ -15,28 +15,34 @@ import java.util.HashMap<K,V>
 ********************************************************************************/
 
 class DNSCache {
-    HashMap<String,String> completeDomainCache;
-    //  HashMap<String,String[]> subDomainCache = new HashMap<String,String[]>;
+    HashMap<String,ArrayList<String>> completeDomainCache;
+    HashMap<String,String[]> subDomainCache;
 
     public DNSCache(){
-	completeDomainCache = new HashMap<String,String>;
+	    completeDomainCache = new HashMap<String,ArrayList<String>>();
+        subDomainCache = new HashMap<String,String[]>();
     }
-    public String getIP(String domain){
-	return completeDomain.get(domain);
+    public ArrayList<String> getIP(String domain){
+	    return completeDomainCache.get(domain);
     }
 
-    public appendComplete(String domain, String ip){
-	
+    public void appendComplete(String domain, ArrayList<String> ip){
+        //TODO NEED TO ADD TTL -- COMBINE IP ADDRESS AND TTL INTO CACHEELEMENT, USE THAT AS ARGUMENT HERE.
+	    completeDomainCache.put(domain, ip);
     }	
 
 
 
     public boolean checkCompleteDomain(String s){
-	//NEED TO ADD CHECK FOR TTL
-	return completeDomainCache.containsKey(s); //tells whether or not complete name is stored in cache
+	    //TODO NEED TO ADD CHECK FOR TTL
+	    return completeDomainCache.containsKey(s); //tells whether or not complete name is stored in cache
     }
 
-    public boolean checkSubDomain(String s){
-
+    public boolean checkTopLevel(String s){
+        return subDomainCache.containsKey(s);
     }
 }
+/* USE THIS WHEN ADDING TTL000000000000000000000000000000000000000000000000000000000000000000000
+class CacheElement {
+    public CacheElement(String domain)
+} */
