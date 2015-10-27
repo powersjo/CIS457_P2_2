@@ -47,6 +47,11 @@ class PacketInfo {
     private int nscount;
     private int arcount;
 
+    //variables for question
+    private int qtype;
+    private int qclass;
+    private String parsedName;
+
     /** variables to hold return values containing useful data */
     private boolean validQuestion = true;
     private String ipAddress = "";
@@ -147,6 +152,10 @@ class PacketInfo {
                     char nextLetter = (char)data[offset++];
                     qString += nextLetter;
                     nameRequested += nextLetter;
+                    parsedName += nextLetter;
+                    if((j+1) == count){
+                        parsedName += ".";
+                    }
                 }
                 count = data[offset++];
                 qString += count;
@@ -155,13 +164,13 @@ class PacketInfo {
 
 
             //read qtype record
-            int qtype = readUnsignedShort();
+            qtype = readUnsignedShort();
             qString += ("\n" + "Type: " + qtype);
             if(qtype != 1)
                 validQuestion = false;
 
             //read qclass record
-            int qclass = readUnsignedShort();
+            qclass = readUnsignedShort();
             qString += ("\n" + "Class: " + qclass);
             if(qclass != 1)
                 validQuestion = false;
@@ -482,5 +491,17 @@ class PacketInfo {
 
     public int getID(){
         return id;
+    }
+
+    public int getQType(){
+        return qtype;
+    }
+
+    public int getQClass(){
+        return qclass;
+    }
+
+    public String getParsedName(){
+        return parsedName;
     }
 }

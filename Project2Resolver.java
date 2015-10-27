@@ -109,10 +109,40 @@ class Project2Resolver {
                 System.out.println("Query is in cache\n");
                 doneSearching = true;
                 byte [] respond = new byte[1024];
-                ByteBuffer buffer =ByteBuffer.allocate(1024);
-                buffer.get(respond);
+                ByteBuffer buffer =ByteBuffer.wrap(respond);
                 buffer.putShort((short)information.getID());
-                buffer.putShort()
+                buffer.putShort((short)0x8180); //hex representation of flags
+                buffer.putShort((short) 1); //QDCount
+                buffer.putShort((short) serverCache.getValue(information.getNameRequested()).size()); //ANCount
+                buffer.putShort((short) 0); //NSCount
+                buffer.putShort((short) 0); //ARCount
+                //Questions section
+                for(int i = 0; i < information.getNameRequested().length(); i++){
+                    buffer.putShort((short) information.getNameRequested().charAt(i));
+                }
+                buffer.putShort((short) information.getQType());
+                buffer.putShort((short) information.getQClass());
+                //Answers section
+                for(String s : serverCache.getValue(information.getNameRequested())){
+                    for(int i = 0; i < information.getNameRequested().length(); i++){
+                        buffer.putShort((short) information.getNameRequested().charAt(i));
+                    }
+                    buffer.putShort((short) 1); //Type field
+                    buffer.putShort((short) 1); //Class Field
+                    buffer.putInt(2000); //TTL field. TODO CHANGE THIS VALUE TO LIFESPAN
+                    buffer.putShort((short) 4); //RDLength, assuming IPv4 address
+                    for(int i = 0; i < s.length(); i++){
+                        if(s.charAt(i) != '.')
+                            buffer.putShort((short) s.charAt(i));
+                    }
+                }
+                System.out.println("\nSending answer to client\n");
+
+                address = InetAddress.getByName("127.0.0.1");
+                int port = packet.getPort();
+                DatagramPacket toClient = new DatagramPacket(respond,
+                        respond.length, address, port);
+                serverSocket.send(toClient);
 
             } /*else if (serverCache.checkTopLevel(){
                  *********************************************************************

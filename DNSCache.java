@@ -31,7 +31,9 @@ class DNSCache {
 	    completeDomainCache.put(domain, ip);
     }	
 
-
+    public ArrayList<String> getValue(String key){
+        return completeDomainCache.get(key);
+    }
 
     public boolean checkCompleteDomain(String s){
 	    //TODO NEED TO ADD CHECK FOR TTL
