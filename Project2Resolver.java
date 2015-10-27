@@ -47,27 +47,9 @@ class Project2Resolver {
         }
 
         // Create a socket that listens on port designated by user.
-        try {
-            serverSocket = new DatagramSocket(socketNum);
-            serverSocket.setSoTimeout(socketTime);
-        } catch (IOException e) {
-            System.out.printf("The port you specified cannot be used. Please launch the application again.\n");
-            System.exit(1);
-        } catch (SocketTimeoutException e) {
-			System.out.println("Conneection timed out");
-			timedOut = true;
-			int countMe = 1;
-			while (timedOut){
-			    try{
-			        serverSocket = new DatagramSocket(socketNum + countMe);
-			        serverSocket.setSoTimeout(socketTime);
-			    } catch (SocketTimeoutException e){
-			        countMe++;
-			        System.out.println("Conneection timed out");
-			    }
-			    timedOut = false;
-			}
-		}
+	  try {
+	      serverSocket = new DatagramSocket(socketNum);
+	      serverSocket.setSoTimeout(socketTime);
         System.out.printf("DNS resolver started on port %d\n", socketNum);
 
         /********************************
@@ -241,6 +223,14 @@ class Project2Resolver {
                 serverSocket.send(toClient);
             }
         }
+} catch (NumberFormatException e) {
+	      System.out.printf("The port you specified cannot be used. Please launch the application again.\n");
+	      System.exit(1);
+	  }
+	  catch (SocketTimeoutException e) {
+	      System.out.println("Connection timed out");
+	      System.exit(1);
+	  }
     }
 
     /*********************************************************
